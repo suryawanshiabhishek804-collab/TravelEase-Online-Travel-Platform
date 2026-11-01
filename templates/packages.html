@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Packages | TravelEase{% endblock %}
+{% block content %}
+<section class="package-hero">
+  <div class="container package-hero-content">
+    <span class="package-hero-eyebrow"><i class="fa-solid fa-suitcase-rolling"></i> YOUR NEXT ADVENTURE, ALL PLANNED</span>
+    <h1>Journeys to remember.<br><span>Packages to love.</span></h1>
+    <p>Find a thoughtfully planned getaway and make more room for the moments that matter.</p>
+    <form class="package-search" action="{{ url_for('packages') }}" method="get" role="search">
+      <label class="visually-hidden" for="package-query">Search by destination or package name</label>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input id="package-query" class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search a destination or package" autocomplete="off">
+      {% if budget %}<input type="hidden" name="budget" value="{{ budget }}">{% endif %}
+      {% if duration %}<input type="hidden" name="duration" value="{{ duration }}">{% endif %}
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+      <button class="btn btn-primary" type="submit">Find packages</button>
+    </form>
+  </div>
+</section>
+
+<section class="container package-results-section">
+  <div class="package-results-heading">
+    <div>
+      <span class="eyebrow">TRAVEL YOUR WAY</span>
+      <h2>Find a trip that feels like you</h2>
+      <p>Explore handpicked journeys across the destinations you love.</p>
+    </div>
+    <span class="package-results-count"><strong>{{ packages|length }}</strong> package{% if packages|length != 1 %}s{% endif %} found</span>
+  </div>
+
+  <form class="package-filters" action="{{ url_for('packages') }}" method="get">
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+    <div class="package-filter-control">
+      <label for="package-budget">Budget</label>
+      <select class="form-select" id="package-budget" name="budget">
+        <option value="" {% if not budget %}selected{% endif %}>Any budget</option>
+        <option value="under-10000" {% if budget == 'under-10000' %}selected{% endif %}>Under ₹10,000</option>
+        <option value="10000-15000" {% if budget == '10000-15000' %}selected{% endif %}>₹10,000 – ₹15,000</option>
+        <option value="over-15000" {% if budget == 'over-15000' %}selected{% endif %}>Over ₹15,000</option>
+      </select>
+    </div>
+    <div class="package-filter-control">
+      <label for="package-duration">Duration</label>
+      <select class="form-select" id="package-duration" name="duration">
+        <option value="" {% if not duration %}selected{% endif %}>Any duration</option>
+        <option value="weekend" {% if duration == 'weekend' %}selected{% endif %}>Up to 3 days</option>
+        <option value="short" {% if duration == 'short' %}selected{% endif %}>4–5 days</option>
+        <option value="week-plus" {% if duration == 'week-plus' %}selected{% endif %}>6+ days</option>
+      </select>
+    </div>
+    <div class="package-filter-control">
+      <label for="package-category">Travel category</label>
+      <select class="form-select" id="package-category" name="category">
+        <option value="" {% if not category %}selected{% endif %}>All categories</option>
+        {% for package_category in categories %}
+          <option value="{{ package_category }}" {% if category == package_category %}selected{% endif %}>{{ package_category }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="package-filter-control package-sort-control">
+      <label for="package-sort">Sort by price</label>
+      <select class="form-select" id="package-sort" name="sort">
+        <option value="price_asc" {% if sort != 'price_desc' %}selected{% endif %}>Low to High</option>
+        <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>High to Low</option>
+      </select>
+    </div>
+    <button class="btn btn-primary package-apply-button" type="submit"><i class="fa-solid fa-sliders me-2" aria-hidden="true"></i>Apply</button>
+    <a class="package-reset-link" href="{{ url_for('packages', q=q or None) }}">Clear filters</a>
+  </form>
+
+  <div class="row g-4 package-grid">
+    {% for p in packages %}
+      <div class="col-md-6 col-xl-4">
+        <article class="package-listing-card">
+          <div class="package-listing-image">
+            <img src="{{ p.image_url }}" alt="{{ p.destination }} travel package" loading="lazy">
+            <span class="package-duration-badge"><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ p.duration }}</span>
+          </div>
+          <div class="package-listing-body">
+            <div class="package-destination"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ p.destination }}</div>
+            <h3>{{ p.title }}</h3>
+            <p class="package-description">{{ p.description }}</p>
+            <div class="package-highlights" aria-label="Package highlights">
+              <span><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> {{ p.destination }}</span>
+              {% if category_by_destination.get(p.destination) %}<span><i class="fa-solid fa-compass" aria-hidden="true"></i> {{ category_by_destination.get(p.destination) }}</span>{% endif %}
+              <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> {{ p.duration }}</span>
+            </div>
+            <div class="package-card-footer">
+              <div class="package-price"><strong>₹{{ "{:,}".format(p.price) }}</strong><span>per person</span></div>
+              <a class="btn btn-primary" href="{{ url_for('book', kind='package', item_id=p.id) }}">Book now <i class="fa-solid fa-arrow-right ms-1" aria-hidden="true"></i></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% else %}
+      <div class="col-12">
+        <div class="package-empty-state">
+          <span><i class="fa-solid fa-suitcase" aria-hidden="true"></i></span>
+          <h3>No packages match your search</h3>
+          <p>Try a different destination or clear some filters to see more trips.</p>
+          <a class="btn btn-primary" href="{{ url_for('packages', q=q or None) }}">Clear filters</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

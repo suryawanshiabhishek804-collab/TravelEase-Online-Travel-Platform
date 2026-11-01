@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Hotels | TravelEase{% endblock %}
+{% block content %}
+<section class="hotel-hero">
+  <div class="container hotel-hero-content">
+    <span class="hotel-hero-eyebrow"><i class="fa-solid fa-bed"></i> STAYS WORTH THE JOURNEY</span>
+    <h1>Find your perfect stay</h1>
+    <p>Discover welcoming hotels, thoughtful comforts and a place to unwind after every adventure.</p>
+    <form class="hotel-search" action="{{ url_for('hotels') }}" method="get" role="search">
+      <label class="visually-hidden" for="hotel-query">Search by hotel or city</label>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input id="hotel-query" class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search a hotel or city" autocomplete="off">
+      {% if price_range %}<input type="hidden" name="price" value="{{ price_range }}">{% endif %}
+      {% if min_rating %}<input type="hidden" name="rating" value="{{ min_rating }}">{% endif %}
+      {% for amenity in selected_amenities %}<input type="hidden" name="amenity" value="{{ amenity }}">{% endfor %}
+      <button class="btn btn-primary" type="submit">Search stays</button>
+    </form>
+  </div>
+</section>
+
+<section class="container hotel-results-section">
+  <div class="hotel-results-heading">
+    <div>
+      <span class="eyebrow">A BETTER WAY TO STAY</span>
+      <h2>Stays made for you</h2>
+      <p>Compare trusted stays and find the right fit for your trip.</p>
+    </div>
+    <span class="hotel-results-count"><strong>{{ hotels|length }}</strong> stay{% if hotels|length != 1 %}s{% endif %} found</span>
+  </div>
+
+  <div class="row g-4">
+    <aside class="col-lg-3">
+      <form class="hotel-filter-panel" action="{{ url_for('hotels') }}" method="get">
+        <div class="hotel-filter-heading"><h3>Filter stays</h3><i class="fa-solid fa-sliders" aria-hidden="true"></i></div>
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+        <fieldset class="hotel-filter-group">
+          <legend>Price per night</legend>
+          <label class="hotel-radio-option"><input type="radio" name="price" value="" {% if not price_range %}checked{% endif %}><span>Any price</span></label>
+          <label class="hotel-radio-option"><input type="radio" name="price" value="under-4000" {% if price_range == 'under-4000' %}checked{% endif %}><span>Under ₹4,000</span></label>
+          <label class="hotel-radio-option"><input type="radio" name="price" value="4000-6000" {% if price_range == '4000-6000' %}checked{% endif %}><span>₹4,000 – ₹6,000</span></label>
+          <label class="hotel-radio-option"><input type="radio" name="price" value="over-6000" {% if price_range == 'over-6000' %}checked{% endif %}><span>Over ₹6,000</span></label>
+        </fieldset>
+        <fieldset class="hotel-filter-group">
+          <legend>Guest rating</legend>
+          <label class="hotel-radio-option"><input type="radio" name="rating" value="" {% if not min_rating %}checked{% endif %}><span>Any rating</span></label>
+          <label class="hotel-radio-option"><input type="radio" name="rating" value="4" {% if min_rating == '4' %}checked{% endif %}><span>4+ <i class="fa-solid fa-star"></i></span></label>
+          <label class="hotel-radio-option"><input type="radio" name="rating" value="4.5" {% if min_rating == '4.5' %}checked{% endif %}><span>4.5+ <i class="fa-solid fa-star"></i></span></label>
+        </fieldset>
+        <fieldset class="hotel-filter-group">
+          <legend>Amenities</legend>
+          {% for amenity_key, amenity_label in amenity_options %}
+            <label class="hotel-check-option"><input type="checkbox" name="amenity" value="{{ amenity_key }}" {% if amenity_key in selected_amenities %}checked{% endif %}><span>{{ amenity_label }}</span></label>
+          {% endfor %}
+        </fieldset>
+        <button class="btn btn-primary w-100" type="submit">Apply filters</button>
+        <a class="hotel-clear-filters" href="{{ url_for('hotels', q=q or None) }}">Clear filters</a>
+      </form>
+    </aside>
+
+    <div class="col-lg-9">
+      <div class="row g-4">
+        {% for h in hotels %}
+          <div class="col-md-6 col-xl-4">
+            <article class="hotel-listing-card">
+              <div class="hotel-listing-image">
+                <img src="{{ h.image_url }}" alt="{{ h.name }} in {{ h.city }}" loading="lazy">
+                <span class="hotel-rating-badge"><i class="fa-solid fa-star" aria-hidden="true"></i> {{ "%.1f"|format(h.rating) }}</span>
+              </div>
+              <div class="hotel-listing-body">
+                <div class="hotel-listing-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ h.city }}</div>
+                <h3>{{ h.name }}</h3>
+                <p class="hotel-listing-description">{{ h.description }}</p>
+                <div class="hotel-amenity-list" aria-label="Amenities">
+                  {% for amenity_key in h.amenities.split(',') if amenity_key %}
+                    <span><i class="fa-solid fa-check" aria-hidden="true"></i> {{ amenity_labels.get(amenity_key, amenity_key|replace('_', ' ')|title) }}</span>
+                  {% endfor %}
+                </div>
+                <div class="hotel-card-footer">
+                  <div class="hotel-nightly-price"><strong>₹{{ "{:,}".format(h.price_per_night) }}</strong><span>per night</span></div>
+                  <a class="btn btn-primary" href="{{ url_for('book', kind='hotel', item_id=h.id) }}">Book now</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        {% else %}
+          <div class="col-12">
+            <div class="hotel-empty-state">
+              <span><i class="fa-solid fa-hotel" aria-hidden="true"></i></span>
+              <h3>No stays match your search</h3>
+              <p>Try changing your search or removing one or more filters.</p>
+              <a class="btn btn-primary" href="{{ url_for('hotels', q=q or None) }}">Clear filters</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

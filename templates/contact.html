@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Contact | TravelEase{% endblock %}
+{% block content %}
+<section class="contact-hero">
+  <div class="container contact-hero-content">
+    <span class="contact-hero-eyebrow"><i class="fa-solid fa-headset"></i> HERE FOR EVERY STEP</span>
+    <h1>Let’s make your<br><span>next trip happen.</span></h1>
+    <p>Questions, ideas, or a little help planning? Send the TravelEase team a note and we’ll be glad to hear from you.</p>
+    <a class="contact-hero-link" href="#contact-form">Get in touch <i class="fa-solid fa-arrow-down" aria-hidden="true"></i></a>
+  </div>
+</section>
+
+<section class="container contact-page-section">
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-4">
+      <div class="contact-info-intro">
+        <span class="eyebrow">WE’RE ALL EARS</span>
+        <h2>How can we help?</h2>
+        <p>Share a few details and your message will reach our team through the TravelEase contact form.</p>
+      </div>
+      <div class="contact-info-card">
+        <span class="contact-info-icon"><i class="fa-regular fa-envelope" aria-hidden="true"></i></span>
+        <div><h3>Send us a message</h3><p>Use the form and we’ll have the details we need to get back to you.</p></div>
+      </div>
+      <div class="contact-info-card">
+        <span class="contact-info-icon"><i class="fa-solid fa-suitcase-rolling" aria-hidden="true"></i></span>
+        <div><h3>Booking question?</h3><p>Include your destination or booking reference so we can better understand your request.</p></div>
+      </div>
+      <div class="contact-info-card">
+        <span class="contact-info-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span>
+        <div><h3>Planning a getaway?</h3><p>Tell us what kind of trip you have in mind. We’d love to hear about it.</p></div>
+      </div>
+      <div class="contact-reassurance"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i><span>Your details are used to respond to your enquiry.</span></div>
+    </div>
+
+    <div class="col-lg-8" id="contact-form">
+      <div class="contact-form-card">
+        <div class="contact-form-heading">
+          <span class="eyebrow">CONTACT TRAVELEASE</span>
+          <h2>Send us a message</h2>
+          <p>Fill in the details below and our team will be in touch.</p>
+        </div>
+        <form method="post" action="{{ url_for('contact') }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="contact-name">Your name</label>
+              <input class="form-control" id="contact-name" name="name" type="text" value="{{ form_values.name }}" maxlength="100" autocomplete="name" placeholder="How should we address you?" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="contact-email">Email address</label>
+              <input class="form-control" id="contact-email" name="email" type="email" value="{{ form_values.email }}" maxlength="150" autocomplete="email" placeholder="you@example.com" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="contact-subject">Subject</label>
+              <input class="form-control" id="contact-subject" name="subject" type="text" value="{{ form_values.subject }}" maxlength="180" placeholder="What can we help you with?" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="contact-message">Your message</label>
+              <textarea class="form-control contact-message-input" id="contact-message" name="message" rows="6" maxlength="10000" placeholder="Tell us a little more about your question..." required>{{ form_values.message }}</textarea>
+              <div class="contact-form-hint">Please don’t include sensitive payment information.</div>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-primary btn-lg contact-submit-button" type="submit">Send message <i class="fa-solid fa-arrow-right ms-2" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

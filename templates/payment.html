@@ -1,0 +1,3 @@
+{% extends "base.html" %}{% block title %}Demo payment | TravelEase{% endblock %}{% block content %}
+<div class="auth-wrap"><div class="auth-card"><span class="eyebrow">SECURE CHECKOUT DEMO</span><h2>Confirm your booking</h2><p class="muted">Reference: {{ booking.reference }}</p><div class="booking-summary"><h5>{{ booking.item_name }}</h5><p>{{ booking.travel_date }} · {{ booking.travellers }} traveller(s)</p><strong class="price">₹{{ "{:,}".format(booking.total_price) }}</strong></div><div class="alert alert-warning">Academic simulation only. This button does not charge money or process real card details.</div><form method="post"><button class="btn btn-primary btn-lg w-100">Simulate successful payment</button></form></div></div>
+{% endblock %}

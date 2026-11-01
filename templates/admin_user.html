@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}User Details | TravelEase Admin{% endblock %}
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <span class="eyebrow">ACCOUNT DIRECTORY</span>
+    <h1>User details</h1>
+    <p>Review this account’s registration information and booking history.</p>
+  </div>
+</div>
+<div class="container section-space">
+  <a class="admin-back-link" href="{{ url_for('admin') }}"><i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>Back to admin dashboard</a>
+  <section class="admin-user-profile" aria-label="User account">
+    <span class="admin-user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
+    <div class="admin-user-profile-main">
+      <span class="eyebrow">REGISTERED USER{% if user.is_admin %} · ADMIN{% endif %}</span>
+      <h2>{{ user.name }}</h2>
+      <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+    </div>
+    <div class="admin-user-profile-meta">
+      <span>Registered</span>
+      <strong>{% if user.created_at %}<time datetime="{{ user.created_at.isoformat() }}">{{ user.created_at.strftime('%b %d, %Y') }}</time>{% else %}Date unavailable{% endif %}</strong>
+    </div>
+    <div class="admin-user-profile-meta">
+      <span>Total bookings</span>
+      <strong>{{ total_bookings }}</strong>
+    </div>
+  </section>
+
+  <section class="admin-table-section admin-user-bookings" aria-labelledby="user-bookings-heading">
+    <div class="admin-section-heading">
+      <div><span class="eyebrow">TRAVEL ACTIVITY</span><h2 id="user-bookings-heading">Booking history</h2><p>Bookings associated with {{ user.name }}.</p></div>
+      <span class="admin-message-count">{{ total_bookings }} booking{% if total_bookings != 1 %}s{% endif %}</span>
+    </div>
+    <div class="table-responsive admin-users-table-wrap">
+      <table class="table align-middle admin-user-bookings-table">
+        <thead><tr><th scope="col">Reference</th><th scope="col">Booking</th><th scope="col">Travel date</th><th scope="col">Travellers</th><th scope="col">Total</th><th scope="col">Status</th><th scope="col">Payment</th></tr></thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td><strong>{{ booking.reference }}</strong></td>
+            <td>{{ booking.item_name }}<span class="admin-booking-type">{{ booking.item_type }}</span></td>
+            <td>{{ booking.travel_date }}</td>
+            <td>{{ booking.travellers }}</td>
+            <td>₹{{ "{:,}".format(booking.total_price) }}</td>
+            <td><span class="pill">{{ booking.status }}</span></td>
+            <td>{{ booking.payment_status }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7"><div class="admin-messages-empty"><i class="fa-regular fa-calendar-xmark" aria-hidden="true"></i><strong>No bookings yet</strong><span>This user’s bookings will appear here.</span></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

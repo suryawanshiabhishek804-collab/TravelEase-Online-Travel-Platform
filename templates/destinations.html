@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Destinations | TravelEase{% endblock %}
+{% block content %}
+<section class="destinations-hero">
+  <div class="container destinations-hero-content">
+    <span class="destinations-eyebrow"><i class="fa-solid fa-compass"></i> YOUR NEXT STORY STARTS HERE</span>
+    <h1>Find your next<br><span>great escape.</span></h1>
+    <p>From slow beach mornings to mountain-top adventures, discover a place that feels like yours.</p>
+    <form class="destination-search" action="{{ url_for('destinations') }}" method="get" role="search">
+      <label class="visually-hidden" for="destination-query">Search destinations</label>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input id="destination-query" class="form-control" type="search" name="q" value="{{ q }}" placeholder="Where would you like to go?" autocomplete="off">
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    <div class="destinations-hero-note"><i class="fa-solid fa-shield-heart"></i> Curated stays. Memorable journeys. TravelEase.</div>
+  </div>
+</section>
+
+<section class="container destinations-section">
+  <div class="destinations-section-heading">
+    <div>
+      <span class="eyebrow">EXPLORE INDIA</span>
+      <h2>Places worth the journey</h2>
+      <p>Find the right backdrop for your next unforgettable trip.</p>
+    </div>
+    <div class="destination-count"><strong>{{ destinations|length }}</strong><span>places to explore</span></div>
+  </div>
+
+  <nav class="destination-filters" aria-label="Filter destinations by category">
+    <a class="destination-filter{% if not category %} active{% endif %}" href="{{ url_for('destinations', q=q or None) }}" {% if not category %}aria-current="page"{% endif %}>All places</a>
+    {% for destination_category in categories %}
+      <a class="destination-filter{% if category == destination_category %} active{% endif %}" href="{{ url_for('destinations', q=q or None, category=destination_category) }}" {% if category == destination_category %}aria-current="page"{% endif %}>{{ destination_category }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="row g-4 destination-grid">
+    {% for d in destinations %}
+      <div class="col-sm-6 col-xl-4">
+        <article class="destination-listing-card">
+          <div class="destination-listing-image">
+            <img src="{{ d.image_url }}" alt="{{ d.name }}, {{ d.state }}" loading="lazy">
+            <span class="destination-image-category">{{ d.category }}</span>
+          </div>
+          <div class="destination-listing-body">
+            <div class="destination-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ d.state }}</div>
+            <h3>{{ d.name }}</h3>
+            <p>{{ d.description }}</p>
+            <a class="destination-package-link" href="{{ url_for('packages') }}">Explore packages <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+      </div>
+    {% else %}
+      <div class="col-12">
+        <div class="destination-empty-state">
+          <span class="destination-empty-icon"><i class="fa-solid fa-map-location-dot"></i></span>
+          <h3>No destinations found</h3>
+          <p>Try a different search or browse all of our places.</p>
+          <a class="btn btn-primary" href="{{ url_for('destinations') }}">View all destinations</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

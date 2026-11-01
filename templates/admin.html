@@ -1,0 +1,66 @@
+{% extends "base.html" %}{% block title %}Admin Dashboard | TravelEase{% endblock %}{% block content %}
+<div class="page-hero"><div class="container"><span class="eyebrow">TRAVELEASE CONTROL CENTRE</span><h1>Admin dashboard</h1><p>Overview of platform activity and booking requests.</p></div></div>
+<div class="container section-space"><div class="row g-3 mb-5">
+{% for label,value,icon in [('Users',users,'fa-users'),('Bookings',bookings,'fa-ticket'),('Destinations',destinations,'fa-map-location-dot'),('Packages',packages,'fa-suitcase-rolling')] %}<div class="col-6 col-lg-3"><div class="stat-card"><i class="fa-solid {{ icon }}"></i><h2>{{ value }}</h2><p>{{ label }}</p></div></div>{% endfor %}
+</div>
+<section class="admin-table-section user-management-section" aria-labelledby="user-management-heading">
+<div class="admin-section-heading user-management-heading">
+<div><span class="eyebrow">ACCOUNT DIRECTORY</span><h2 id="user-management-heading">Users management</h2><p>Browse registered accounts and their booking activity.</p></div>
+<span class="admin-message-count">{{ users }} users · {{ bookings }} bookings</span>
+</div>
+<form class="admin-user-search" action="{{ url_for('admin') }}" method="get" role="search">
+<label class="visually-hidden" for="admin-user-query">Search users by name or email</label>
+<i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+<input class="form-control" id="admin-user-query" name="q" type="search" value="{{ user_search }}" placeholder="Search by name or email">
+<button class="btn btn-primary" type="submit">Search users</button>
+{% if user_search %}<a class="admin-user-clear" href="{{ url_for('admin') }}">Clear</a>{% endif %}
+</form>
+<div class="table-responsive admin-users-table-wrap">
+<table class="table align-middle admin-users-table">
+<thead><tr><th scope="col">User</th><th scope="col">Email</th><th scope="col">Registered</th><th scope="col">Bookings</th><th scope="col">Details</th></tr></thead>
+<tbody>
+{% for user, booking_count in users_with_bookings %}
+<tr>
+<td class="admin-user-name">{{ user.name }}</td>
+<td><a href="mailto:{{ user.email }}">{{ user.email }}</a>{% if user.is_admin %}<span class="admin-role-badge">Admin</span>{% endif %}</td>
+<td class="admin-user-date">{% if user.created_at %}<time datetime="{{ user.created_at.isoformat() }}">{{ user.created_at.strftime('%b %d, %Y') }}</time>{% else %}Date unavailable{% endif %}</td>
+<td><span class="admin-user-booking-count">{{ booking_count }}</span></td>
+<td><a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_user_details', user_id=user.id) }}">View details</a></td>
+</tr>
+{% else %}
+<tr><td colspan="5"><div class="admin-messages-empty"><i class="fa-solid fa-user-slash" aria-hidden="true"></i><strong>{% if user_search %}No users match your search{% else %}No registered users yet{% endif %}</strong><span>{% if user_search %}Try a different name or email address.{% else %}Registered accounts will appear here.{% endif %}</span></div></td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</section>
+<section class="admin-table-section" aria-labelledby="recent-bookings-heading">
+<h2 class="mb-3" id="recent-bookings-heading">Recent bookings</h2>
+<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Reference</th><th>Customer</th><th>Item</th><th>Travel date</th><th>Amount</th><th>Status</th><th>Update</th></tr></thead><tbody>{% for b in recent %}<tr><td>{{ b.reference }}</td><td>{{ b.user.name }}</td><td>{{ b.item_name }}</td><td>{{ b.travel_date }}</td><td>₹{{ "{:,}".format(b.total_price) }}</td><td>{{ b.status }}</td><td><form method="post" action="{{ url_for('admin_booking_status', booking_id=b.id) }}" class="d-flex gap-2"><select class="form-select form-select-sm" name="status"><option>Confirmed</option><option>Cancellation requested</option><option>Cancelled</option></select><button class="btn btn-sm btn-primary">Save</button></form></td></tr>{% else %}<tr><td colspan="7">No bookings yet.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+<section class="admin-table-section contact-messages-section" aria-labelledby="contact-messages-heading">
+<div class="admin-section-heading">
+<div><span class="eyebrow">CUSTOMER SUPPORT</span><h2 id="contact-messages-heading">Contact messages</h2><p>Messages submitted through the TravelEase contact form.</p></div>
+<span class="admin-message-count">{{ contact_messages|length }} message{% if contact_messages|length != 1 %}s{% endif %}</span>
+</div>
+<div class="table-responsive admin-messages-table-wrap">
+<table class="table align-middle admin-messages-table">
+<thead><tr><th scope="col">Customer</th><th scope="col">Email</th><th scope="col">Subject</th><th scope="col">Message</th><th scope="col">Submitted</th></tr></thead>
+<tbody>
+{% for contact_message in contact_messages %}
+<tr>
+<td class="admin-message-name">{{ contact_message.name }}</td>
+<td><a href="mailto:{{ contact_message.email }}">{{ contact_message.email }}</a></td>
+<td class="admin-message-subject">{{ contact_message.subject or 'No subject' }}</td>
+<td class="admin-message-content">{{ contact_message.message }}</td>
+<td class="admin-message-date">{% if contact_message.created_at %}<time datetime="{{ contact_message.created_at.isoformat() }}">{{ contact_message.created_at.strftime('%b %d, %Y') }}<span>{{ contact_message.created_at.strftime('%I:%M %p') }}</span></time>{% else %}Date unavailable{% endif %}</td>
+</tr>
+{% else %}
+<tr><td colspan="5"><div class="admin-messages-empty"><i class="fa-regular fa-envelope-open" aria-hidden="true"></i><strong>No contact messages yet</strong><span>Messages submitted by customers will appear here.</span></div></td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</section>
+</div>
+{% endblock %}

@@ -1,5 +1,17 @@
 # TravelEase – Online Travel Platform
 
+## 🌐 Live Website
+
+Visit our website:
+https://travelease-19q6.onrender.com
+
+## Project Description
+
+TravelEase is an Online Travel Platform
+developed using Python Flask, SQLite,
+HTML, CSS, JavaScript and Bootstrap.           
+# TravelEase – Online Travel Platform
+
 A college-level full-stack travel platform demonstration built with Python Flask, SQLite, SQLAlchemy, HTML, CSS, JavaScript and Bootstrap.
 
 ## Features
